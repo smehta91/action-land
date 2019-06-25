@@ -2,10 +2,11 @@ type Action<T = unknown, V = unknown> = [T, V]
 
 type iActionValue<A, T, D = never> = A extends Action<T, infer V> ? V : D
 
-type Component<S1, V, IA1 = never, OA1 = never, C1 = unknown, P1 = never> = {
-  init<T>(state: T): Component<T, V, IA1, OA1, C1, P1>
-  initilize: () => S1
+type VNode = string
 
+declare function COM<S>(state: S): Component<S, VNode>
+
+type Component<S1, V, IA1 = never, OA1 = never, C1 = unknown, P1 = never> = {
   matchR<AT extends string | number, S2, AV>(
     type: AT,
     cb: (v: iActionValue<IA1, AT, AV>, s: S1) => S2
@@ -33,9 +34,15 @@ type Component<S1, V, IA1 = never, OA1 = never, C1 = unknown, P1 = never> = {
   ): Component<S1, V, IA1, OA1, C1, P1>
 
   render(props: P1): V
+
+  setInit(cb: (a: S1) => S1): Component<S1, V, IA1, OA1, C1, P1>
+
+  init<P1>(p : P1): S1
 }
 
-type VNode = string
+// declare const Btn: Component<{color: string, text: string}, VNode, Action<'click', MouseEvent>>
+// const RedBtn = Btn.init({color: 'red'}) // RedBtn<{text: string}>
+
 declare function h(
   type: string,
   props: {on?: {[s: string]: string}},
@@ -65,6 +72,11 @@ const a = c1
   .matchR('hover', (ev: MouseEvent, s) => ({
     color: s.color.toLowerCase()
   }))
+  .matchC('keydown', (v: KeyboardEvent, s: {color: string}) => [
+    'set',
+    v.charCode
+  ])
+  .setInit((p) => ({color: 'blue'}))
   .forward('c2', c2)
   .view((e, s, v) => {
     return h('div', {}, [
@@ -77,7 +89,6 @@ const b = c1.matchC('keydown', (v: KeyboardEvent, s: {color: string}) => [
   v.charCode
 ])
 
-/**
- * Fix matchR/ match C typings to accomodate duplicate action types
- * Emitter to function like click: e.click
- */
+
+
+//init(b, {name: 'hello'})
