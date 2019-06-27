@@ -1,4 +1,5 @@
 type Action<T = unknown, V = unknown> = [T, V]
+type VNode = string
 
 type Component<S1, V, IA1 = never, OA1 = never, C1 = unknown, P1 = never> = {
   matchR<AT extends string | number, AV, S2>(
@@ -29,22 +30,22 @@ type Component<S1, V, IA1 = never, OA1 = never, C1 = unknown, P1 = never> = {
   render(props: P1): V
 }
 
-type VNode = string
 declare function h(
   type: string,
   props: {on?: {[s: string]: string}},
   children: [VNode]
 ): VNode
+
 declare const c1: Component<
   {color: string},
-  string,
+  VNode,
   Action<'click', Event>,
   never
 >
 
 declare const c2: Component<
   {age: number},
-  string,
+  VNode,
   Action<'GQL', Response>,
   never,
   never,
@@ -63,8 +64,3 @@ const a = c1
   .view((e, s, v) => {
     return h('div', {}, [h('button', {}, [v.c2.render({name: 'tushar'})])])
   })
-
-/**
- * Fix matchR/ match C typings to accomodate duplicate action types
- * Emitter to function like click: e.click
- */
