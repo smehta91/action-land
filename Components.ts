@@ -45,7 +45,7 @@ type Component<S1, V, IA1 = never, OA1 = never, C1 = unknown, P1 = never> = {
     spec: {[key in keyof S1]?: S1[key]}
   ): Component<S1, V, IA1, OA1, C1, P1>
 
-  init(params?: {[key in keyof S1]: S1[key]}): S1
+  init(params?: {[key in keyof S1]?: S1[key]}): S1
 }
 
 /** EXAMPLES */
@@ -101,3 +101,5 @@ const greenButton2 = redButton.initWith({bgColor: 'green'})
 
 // When I'm ready to get the state of that component
 const state = redButton.init()
+
+const orangeState = greenButton.init({bgColor: 'orange'})
