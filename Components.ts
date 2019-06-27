@@ -1,6 +1,17 @@
+import init from 'ramda/es/init'
+
 type Action<T = unknown, V = unknown> = [T, V]
 type VNode = string
 
+/**
+ * Component Constructor
+ * @param state : Any State object
+ */
+declare function COM<S>(state: S): Component<S, VNode>
+
+/**
+ * Component Type
+ */
 type Component<S1, V, IA1 = never, OA1 = never, C1 = unknown, P1 = never> = {
   matchR<AT extends string | number, AV, S2>(
     type: AT,
@@ -27,8 +38,16 @@ type Component<S1, V, IA1 = never, OA1 = never, C1 = unknown, P1 = never> = {
   view(
     cb: (e: (act: IA1) => void, s: S1, v: {[k in keyof C1]: C1[k]}) => V
   ): Component<S1, V, IA1, OA1, C1, P1>
+
   render(props: P1): V
+
+  init<K extends keyof S1>(
+    key: K,
+    value: S1[K]
+  ): Component<Omit<S1, K>, V, IA1, OA1, C1, P1>
 }
+
+/** EXAMPLES */
 
 declare function h(
   type: string,
@@ -64,3 +83,15 @@ const a = c1
   .view((e, s, v) => {
     return h('div', {}, [h('button', {}, [v.c2.render({name: 'tushar'})])])
   })
+
+/**
+ * Partially applying a value to the state
+ * - Could be useful for binding config values to a component's state
+ * - Could be used to curry certain components instead of creating new ones
+ * */
+
+// Button component, with some initial state
+const button = COM({bgColor: '#95a5a6', content: 'Hello World'})
+
+// Red button, created by partially applying one of the state variables
+const redButton = button.init('bgColor', 'red')
