@@ -41,10 +41,11 @@ type Component<S1, V, IA1 = never, OA1 = never, C1 = unknown, P1 = never> = {
 
   render(props: P1): V
 
-  init<K extends keyof S1>(
-    key: K,
-    value: S1[K]
-  ): Component<Omit<S1, K>, V, IA1, OA1, C1, P1>
+  initWith(
+    spec: {[key in keyof S1]?: S1[key]}
+  ): Component<S1, V, IA1, OA1, C1, P1>
+
+  init(params?: {[key in keyof S1]: S1[key]}): S1
 }
 
 /** EXAMPLES */
@@ -85,13 +86,18 @@ const a = c1
   })
 
 /**
- * Partially applying a value to the state
- * - Could be useful for binding config values to a component's state
- * - Could be used to curry certain components instead of creating new ones
+ * Declare initial values for state
  * */
 
 // Button component, with some initial state
 const button = COM({bgColor: '#95a5a6', content: 'Hello World'})
 
 // Red button, created by partially applying one of the state variables
-const redButton = button.init('bgColor', 'red')
+const redButton = button.initWith({bgColor: 'red'})
+
+// greenButton == greenButton2
+const greenButton = button.initWith({bgColor: 'green'})
+const greenButton2 = redButton.initWith({bgColor: 'green'})
+
+// When I'm ready to get the state of that component
+const state = redButton.init()
