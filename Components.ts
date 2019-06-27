@@ -9,19 +9,25 @@ type VNode = string
  */
 declare function COM<S>(state: S): Component<S, VNode>
 
+// Type Lambdas
+type iActionValue<A, T, D = never> = A extends Action<T, infer V> ? V : D
+
 /**
  * Component Type
  */
 type Component<S1, V, IA1 = never, OA1 = never, C1 = unknown, P1 = never> = {
-  matchR<AT extends string | number, AV, S2>(
+  init<T>(state: T): Component<T, V, IA1, OA1, C1, P1>
+  initilize: () => S1
+
+  matchR<AT extends string | number, S2, AV>(
     type: AT,
-    cb: (v: AV, s: S1) => S2
+    cb: (v: iActionValue<IA1, AT, AV>, s: S1) => S2
   ): Component<S2, V, IA1 | Action<AT, AV>, OA1, C1, P1>
 
-  matchC<AT extends string | number, AV, A extends Action>(
+  matchC<AT extends string | number, AV, OT extends string | number, OV>(
     type: AT,
-    cb: (v: AV, s: S1) => A
-  ): Component<S1, V, IA1 | Action<AT, AV>, OA1 | A, C1, P1>
+    cb: (v: AV, s: S1) => Action<OT, OV>
+  ): Component<S1, V, IA1 | Action<AT, AV>, OA1 | Action<OT, OV>, C1, P1>
 
   forward<K extends string | number, S2, IA2, OA2, C2, P2>(
     k: K,
@@ -53,7 +59,7 @@ type Component<S1, V, IA1 = never, OA1 = never, C1 = unknown, P1 = never> = {
 declare function h(
   type: string,
   props: {on?: {[s: string]: string}},
-  children: [VNode]
+  children: VNode[]
 ): VNode
 
 declare const c1: Component<
@@ -76,14 +82,20 @@ const a = c1
   .matchR('hover', (ev: MouseEvent, s) => ({
     color: s.color.toLowerCase()
   }))
-  .matchR('hover', (ev: Response, s) => ({
-    sign: s.color.toUpperCase()
+  .matchR('hover', (ev: MouseEvent, s) => ({
+    color: s.color.toLowerCase()
   }))
-  .matchC('gql', (res: Response, s) => ['abc', res])
   .forward('c2', c2)
   .view((e, s, v) => {
-    return h('div', {}, [h('button', {}, [v.c2.render({name: 'tushar'})])])
+    return h('div', {}, [
+      h('button', {}, [v.c2.render({name: 'tushar'}), 'hello'])
+    ])
   })
+
+const b = c1.matchC('keydown', (v: KeyboardEvent, s: {color: string}) => [
+  'set',
+  v.charCode
+])
 
 /**
  * Declare initial values for state
