@@ -48,7 +48,7 @@ type Component<S1, V, IA1 = never, OA1 = never, C1 = unknown, P1 = never> = {
   render(props: P1): V
 
   initWith(
-    spec: {[key in keyof S1]?: S1[key]}
+    spec: {[key in keyof S1]: S1[key]}
   ): Component<S1, V, IA1, OA1, C1, P1>
 
   init(params?: {[key in keyof S1]?: S1[key]}): S1
@@ -105,11 +105,11 @@ const b = c1.matchC('keydown', (v: KeyboardEvent, s: {color: string}) => [
 const button = COM({bgColor: '#95a5a6', content: 'Hello World'})
 
 // Red button, created by partially applying one of the state variables
-const redButton = button.initWith({bgColor: 'red'})
+const redButton = button.initWith({bgColor: 'red', content: ''})
 
 // greenButton == greenButton2
-const greenButton = button.initWith({bgColor: 'green'})
-const greenButton2 = redButton.initWith({bgColor: 'green'})
+const greenButton = button.initWith({bgColor: 'green', content: ''})
+const greenButton2 = redButton.initWith({bgColor: 'green', content: ''})
 
 // When I'm ready to get the state of that component
 const state = redButton.init()
